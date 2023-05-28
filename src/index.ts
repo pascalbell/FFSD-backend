@@ -1,26 +1,35 @@
 import express, {NextFunction, Request, Response} from "express";
-const app = express();
+import session, { SessionData } from 'express-session';
 const PORT: number = 80;
+const app = express();
+const users:string[] = [];                  //change this to the database later
 
-
-const arr:string[] = [];
-app.use(express.json());
+app.use(express.json());                    //allows parsing on json
 app.use(express.urlencoded());
+app.use(session({
+    secret: "asdfghjgkl",
+    resave: false,
+    saveUninitialized:false,
+    cookie: { maxAge: 86400000 }            //set the cookie (login session) to expire after one day
+}))
 
 
 app.get("/api/login", (req: Request, res: Response) => {
-    res.send(arr);
+    res.send(users);
 })
 
 
 app.post("/api/login", (req: Request, res: Response) => {
-    if (!req.body.username || !req.body.password) {
+    const { username, password } = req.body;
+    const user = { username, password };
+
+    if (!user.username || !user.password) {
         res.status(422).json({error: true});
         return;
     }
     console.log(req.body);
-    arr.push(req.body);
-    res.send(201);  //status didnt work for some reason
+    users.push(req.body);
+    res.status(201).send();  //status didnt work for some reason
 });
 
 
