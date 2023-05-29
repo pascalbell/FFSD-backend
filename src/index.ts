@@ -1,10 +1,15 @@
 import express, {NextFunction, Request, Response} from "express";
 import session, { SessionData } from 'express-session';
 import router, { User } from "./auth";
+import mongoose from "mongoose";
+
+mongoose
+    .connect("mongodb://localhost:27017/FFSD")
+    .then(() => { console.log("connected") })
+    .catch((err) => { console.log(err) })
+
 const PORT: number = 80;
 const app = express();
-
-const users: User[] = [];                   //switch to database later
 
 app.use(express.json());                    //allows parsing on json
 app.use(express.urlencoded());
@@ -23,7 +28,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/api/login', router);
+app.use('/api', router);
 
 
 app.listen(PORT, () => console.log(`Running on port ${PORT}`)); //listens for requests on port 80
