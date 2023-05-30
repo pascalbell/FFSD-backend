@@ -20,12 +20,13 @@ app.use(session({
     cookie: { maxAge: 86400000 }            //set the cookie (login session) to expire after one day
 }))
 
-app.use((req, res, next) => {
+app.use((req, res, next) => {               //put this middleware locally into the routes so that you can access the login file without it being unauthorized
     const user = req.session as User;
     if (user && user.username && user.password) {
-        res.locals.user = user;
+        res.locals.user = user;             //not sure why this
+        next();
     }
-    next();
+    else res.send(401);
 })
 
 app.use('/api', router);
