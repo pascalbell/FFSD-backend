@@ -26,7 +26,8 @@ app.use((req, res, next) => {               //put this middleware locally into t
         res.locals.user = user;             //not sure why this
         next();
     }
-    else res.send(401);
+    //else res.send(401);
+    next();
 })
 
 app.use('/api', router);
