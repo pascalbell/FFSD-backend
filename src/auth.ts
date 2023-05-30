@@ -51,7 +51,6 @@ router.post("/signup", async (req: Request, res: Response) => {
         return;
     }
     const hashedPass = bcrypt.hashSync(password, salt)
-    console.log(hashedPass);
     const newUser = await UserModel.create({ username, password: hashedPass, email });
     //newUser.save();                 //dont need this i dont think
 
