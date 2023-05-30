@@ -1,8 +1,8 @@
-import express, {NextFunction, Request, Response, Router} from "express";
-import session, { SessionData } from 'express-session';
+import {Request, Response, Router} from "express";
+import { SessionData } from 'express-session';
 import UserModel from "./models/User";
-import { error } from "console";
 import bcrypt from 'bcrypt';
+import { ErrMsg } from "./util";
 const router = Router();
 const salt = bcrypt.genSaltSync();
 
@@ -13,7 +13,7 @@ export interface User extends SessionData {        //Session data
 
 router.post("/login", async (req, res) => {
     if (!req.body || !req.body.username || !req.body.password) {
-        res.status(422).json({message: "not all fields provided"});
+        res.status(422).json(ErrMsg("not all fields provided"));
         return;
     }
     
@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
         // Perform the necessary actions when the login is successful
 
         if(res.locals.user) {
-            res.status(201).json({ message: 'already logged in!' });
+            res.status(201).json(ErrMsg('already logged in!'));
             return;
         }
         
@@ -35,19 +35,19 @@ router.post("/login", async (req, res) => {
         res.status(200).json({ message: 'Login successful' });
         return;
     }    
-    res.status(422).json({ message: 'Wrong password or username!' });
+    res.status(422).json(ErrMsg('Wrong password or username!'));
 });
 
 router.post("/signup", async (req: Request, res: Response) => {
     const { username, password, email } = req.body;
     if (!username || !password || !email || typeof username != "string" || typeof password != "string" || typeof email != "string") {
         //add other fields above if need more
-        res.status(422).json({ error: "signup must have username, password, and email"});
+        res.status(422).json(ErrMsg("signup must have username, password, and email"));
         return;
     }
     const userDB = await UserModel.findOne({ $or: [{ username }, { email }]});
     if (userDB) {
-        res.status(400).send({ msg: "User already exists!" });
+        res.status(400).send(ErrMsg("User already exists!"));
         return;
     }
     const hashedPass = bcrypt.hashSync(password, salt)
@@ -61,7 +61,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 router.post("/signout", (req: Request, res: Response) => {
     res.locals = {};
     req.session.destroy((err) => {
-        if (err) res.status(500).json({ message: "error signing out" })
+        if (err) res.status(500).json(ErrMsg("error signing out"))
         else res.status(200).json({ message: "signed out sucessfully" })
     })
 })
