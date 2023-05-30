@@ -11,14 +11,9 @@ export interface User extends SessionData {        //Session data
     password?: string;
 }
 
-router.post("/login", async (req, res) => {               //check if password matches
+router.post("/login", async (req, res) => {
     if (!req.body || !req.body.username || !req.body.password) {
-        res.status(422).json({error: true});
-        return;
-    }
-
-    if(res.locals.user) {
-        res.status(201).json({ message: 'already logged in!' });
+        res.status(422).json({message: "not all fields provided"});
         return;
     }
     
@@ -29,15 +24,18 @@ router.post("/login", async (req, res) => {               //check if password ma
     if (userDB && bcrypt.compareSync(password, userDB.password)) {
         // Passwords match
         // Perform the necessary actions when the login is successful
+
+        if(res.locals.user) {
+            res.status(201).json({ message: 'already logged in!' });
+            return;
+        }
         
-         //res.locals.user = user;
         user.username = userDB.username;
         user.password = userDB.password;
         res.status(200).json({ message: 'Login successful' });
         return;
     }    
     res.status(422).json({ message: 'Wrong password or username!' });
-    return;
 });
 
 router.post("/signup", async (req: Request, res: Response) => {
@@ -57,9 +55,15 @@ router.post("/signup", async (req: Request, res: Response) => {
     const newUser = await UserModel.create({ username, password: hashedPass, email });
     //newUser.save();                 //dont need this i dont think
 
-    console.log("User created!");
-    res.send(201);
-    return;
+    res.status(201).json({ message: "User created!" });
 });
+
+router.post("/signout", (req: Request, res: Response) => {
+    res.locals = {};
+    req.session.destroy((err) => {
+        if (err) res.status(500).json({ message: "error signing out" })
+        else res.status(200).json({ message: "signed out sucessfully" })
+    })
+})
 
 export default router;

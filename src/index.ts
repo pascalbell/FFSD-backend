@@ -2,14 +2,13 @@ import express, {NextFunction, Request, Response} from "express";
 import session, { SessionData } from 'express-session';
 import router, { User } from "./auth";
 import mongoose from "mongoose";
+const PORT: number = 80;
+const app = express();
 
 mongoose
     .connect("mongodb://localhost:27017/FFSD")
     .then(() => { console.log("connected") })
     .catch((err) => { console.log(err) })
-
-const PORT: number = 80;
-const app = express();
 
 app.use(express.json());                    //allows parsing on json
 app.use(express.urlencoded());
