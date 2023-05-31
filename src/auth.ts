@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import { SessionData } from 'express-session';
 import UserModel from "./models/User";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { ErrMsg } from "./util";
 const router = Router();
 const salt = bcrypt.genSaltSync();
