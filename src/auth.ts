@@ -11,13 +11,22 @@ export interface User extends SessionData {        //Session data
     password?: string;
 }
 
-router.get("/login", (req, res) => {
+/*router.get("/login", (req, res) => {
     if (res.locals.user) {
         res.status(200).json({message: "logged in"});
         return;
     }
     res.status(400).json(ErrMsg("not logged in"));
-});
+});*/
+
+router.get("/login", (req, res) => {          //dont need two get requests, delete one above
+    if (res.locals.user) {
+        const user = res.locals.user;
+        res.status(200).json({ username: user.username });
+        return;
+    }
+    res.status(400).json(ErrMsg("not logged in!"));
+})
 
 router.post("/login", async (req, res) => {
     if (!req.body || !req.body.username || !req.body.password) {
