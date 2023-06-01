@@ -20,15 +20,6 @@ app.use(session({
     cookie: { maxAge: 86400000 }            //set the cookie (login session) to expire after one day
 }))
 
-app.use((req, res, next) => {   // allows for endpoint verification of session
-    const user = req.session as User;
-    if (user && (user.id !== "no session id" && user.id)) {
-        res.locals.user = user;             // change to store id in local
-    }
-    console.log(res.locals.user);
-    next();
-})
-
 app.use('/api', router);
 
 

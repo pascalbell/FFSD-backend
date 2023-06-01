@@ -1,6 +1,7 @@
 //database representation of a user
 
 import mongoose from "mongoose";
+import { isUndefined } from "util";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -25,11 +26,6 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default: new Date()
     },
-    sessionID: {
-        type: String,
-        required: true,
-        default: "no session id"
-    }
     //add more fields ask Michelle --> first and last names, etc.
 });
 
