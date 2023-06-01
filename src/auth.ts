@@ -7,17 +7,8 @@ const router = Router();
 const salt = bcrypt.genSaltSync();
 
 export interface User extends SessionData {        //Session data
-    username?: string;
-    password?: string;
+    id?: string;
 }
-
-/*router.get("/login", (req, res) => {
-    if (res.locals.user) {
-        res.status(200).json({message: "logged in"});
-        return;
-    }
-    res.status(400).json(ErrMsg("not logged in"));
-});*/
 
 router.get("/login", (req, res) => {          //dont need two get requests, delete one above
     if (res.locals.user) {
@@ -36,19 +27,16 @@ router.post("/login", async (req, res) => {
     
     const user = req.session as User;
     const username = req.body.username;
-    const password = req.body.password;
     const userDB = await UserModel.findOne({ username });
-    if (userDB && bcrypt.compareSync(password, userDB.password)) {
+    if (userDB && bcrypt.compareSync(req.body.password, userDB.password)) {
         // Passwords match
         // Perform the necessary actions when the login is successful
-
         if(res.locals.user) {
             res.status(201).json(ErrMsg('already logged in!'));
             return;
         }
-        
-        user.username = userDB.username;
-        user.password = userDB.password;
+        user.id = req.sessionID;
+        await UserModel.updateOne({ username: username }, { $set: { sessionID: req.sessionID }})
         res.status(200).json({ message: 'Login successful' });
         return;
     }    
@@ -74,11 +62,14 @@ router.post("/signup", async (req: Request, res: Response) => {
     res.status(201).json({ message: "User created!" });
 });
 
-router.post("/signout", (req: Request, res: Response) => {
-    res.locals = {};
+router.post("/signout", async (req: Request, res: Response) => {
+    await UserModel.updateOne({ sessionID: (req.session as User).id }, { $set: { sessionID: "no session id" }})
     req.session.destroy((err) => {
         if (err) res.status(500).json(ErrMsg("error signing out"))
-        else res.status(200).json({ message: "signed out sucessfully" })
+        else {
+            res.status(200).json({ message: "signed out sucessfully" });
+            res.locals.user = undefined;
+        }
     })
 })
 

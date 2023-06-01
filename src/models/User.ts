@@ -24,6 +24,11 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         required: true,
         default: new Date()
+    },
+    sessionID: {
+        type: String,
+        required: true,
+        default: "no session id"
     }
     //add more fields ask Michelle --> first and last names, etc.
 });
