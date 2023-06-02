@@ -11,7 +11,7 @@ export interface User extends SessionData {        //Session data
     _id?: String;
 }
 
-router.get("/me", async (req, res) => {          //dont need two get requests, delete one above
+router.get("/me", async (req, res) => {
     const user = req.session as User;
     if (!user._id) {
         res.status(400).json(ErrMsg("not logged in!"));
