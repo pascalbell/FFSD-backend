@@ -1,7 +1,6 @@
 //database representation of a user
 
 import mongoose from "mongoose";
-import { isUndefined } from "util";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -16,12 +15,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    emailValid: {
+    email_valid: {
         type: Boolean,
         required: true,
         default: false
     },
-    createdAt: {
+    created_at: {
         type: Date,
         required: true,
         default: new Date()
