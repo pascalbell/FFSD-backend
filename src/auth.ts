@@ -18,8 +18,10 @@ router.get("/me", async (req, res) => {
         return;
     }
     const userDB = await UserModel.findOne({ _id: user._id }) as any;
-    delete userDB.password;
-    res.status(200).json(userDB);
+    const copyUser = Object.assign({}, userDB);
+    delete copyUser.password;
+    copyUser.save();
+    res.status(200).json({user: copyUser});
 
 })
 
