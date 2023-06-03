@@ -6,10 +6,9 @@ import "dotenv/config";
 const PORT: number = 80;
 const app = express();
 
-mongoose
-    .connect(process.env.MONGODB_URI!)
+mongoose.connect(process.env.MONGODB_URI!)
     .then(() => { console.log("connected") })
-    .catch((err) => { console.log(err) })
+    .catch((err) => { console.log(err) });
 
 app.use(express.json());                    //allows parsing on json
 app.use(express.urlencoded());
@@ -18,7 +17,7 @@ app.use(session({
     resave: false,
     saveUninitialized:false,
     cookie: { maxAge: 86400000 }            //set the cookie (login session) to expire after one day
-}))
+}));
 
 app.use('/api', router);
 

@@ -84,7 +84,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     const hashedPass = bcrypt.hashSync(password, salt);
     await UserModel.create({ username, password: hashedPass, email });
 
-    res.status(201).send();
+    res.status(201).json({});
 });
 
 router.post("/signout", async (req: Request, res: Response) => {
