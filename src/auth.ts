@@ -20,8 +20,7 @@ router.get("/me", async (req, res) => {
     const userDB = await UserModel.findOne({ _id: user._id }) as any;
     const copyUser = Object.assign({}, userDB);
     delete copyUser.password;
-    copyUser.save();
-    res.status(200).json({user: copyUser});
+    res.status(200).json({username: copyUser._doc.username});       //change this last field to access diff fields
 
 })
 
