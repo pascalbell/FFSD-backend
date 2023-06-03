@@ -84,13 +84,13 @@ router.post("/signup", async (req: Request, res: Response) => {
     const hashedPass = bcrypt.hashSync(password, salt);
     await UserModel.create({ username, password: hashedPass, email });
 
-    res.status(201);
+    res.status(201).send();
 });
 
 router.post("/signout", async (req: Request, res: Response) => {
     destroySession(req)
         .then(() => {
-            res.status(200);
+            res.status(200).send();
         })
         .catch((e: JSONObject) => {
             console.log(e);
