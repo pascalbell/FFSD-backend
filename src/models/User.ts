@@ -11,10 +11,6 @@ const UserSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
-    email: {
-        type: String,
-        required: true
-    },
     email_valid: {
         type: Boolean,
         required: true,
@@ -25,6 +21,14 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default: new Date()
     },
+    hashed_email: {
+        type: String,
+        required: true
+    },
+    encrypted_email: {
+        type: String,
+        required: true
+    }
     //add more fields ask Michelle --> first and last names, etc.
 });
 

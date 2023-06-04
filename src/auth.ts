@@ -4,8 +4,10 @@ import UserModel from "./models/User";
 import bcrypt from 'bcryptjs';
 import { ErrMsg, cleanUser } from "./util";
 import { ObjectId } from "mongoose";
+import crypto from 'crypto';
 const router = Router();
 const salt = bcrypt.genSaltSync();
+const email_salt = bcrypt.genSaltSync();
 
 export interface User extends SessionData {        //Session data
     _id?: String;
@@ -74,7 +76,8 @@ router.post("/signup", async (req: Request, res: Response) => {
         res.status(422).json(ErrMsg("Signup must have a valid username, password, and email."));
         return;
     }
-    const userDB = await UserModel.findOne({ $or: [{ username }, { email }]});
+    const hashedEmail = bcrypt.hashSync(email, email_salt);
+    const userDB = await UserModel.findOne({ $or: [{ username }, { hashedEmail }]});
     
     if (userDB) {
         res.status(400).send(ErrMsg("User already exists!"));
@@ -82,7 +85,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     }
 
     const hashedPass = bcrypt.hashSync(password, salt);
-    await UserModel.create({ username, password: hashedPass, email });
+    await UserModel.create({ username, password: hashedPass, hashed_email: hashedEmail });
 
     res.status(201).json({});
 });
