@@ -34,13 +34,13 @@ router.get("/me", async (req, res) => {
     }
     const userDB = await UserModel.findOne({ _id: user._id }) as any;
 
-    if(!userDB){
+    if (!userDB) {
         destroySession(req);
         res.status(404).json(ErrMsg("Not logged in!"));
         return;
     }
     
-    res.status(200).json(cleanUser(userDB._doc));       //change this last field to access diff fields
+    res.status(200).json(cleanUser(userDB._doc));
 })
 
 router.post("/login", async (req, res) => {
@@ -55,7 +55,7 @@ router.post("/login", async (req, res) => {
     if (userDB && bcrypt.compareSync(req.body.password, userDB.password)) {
         // Passwords match
         // Perform the necessary actions when the login is successful
-        if(user._id) {
+        if (user._id) {
             res.status(201).json(ErrMsg('Already logged in!'));
             return;
         }
