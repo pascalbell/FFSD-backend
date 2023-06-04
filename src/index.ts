@@ -1,8 +1,8 @@
+import "dotenv/config";
 import express from "express";
 import session from 'express-session';
 import router, { User } from "./auth";
 import mongoose from "mongoose";
-import "dotenv/config";
 const PORT: number = 80;
 const app = express();
 

@@ -2,9 +2,8 @@ import {Request, Response, Router} from "express";
 import { SessionData } from 'express-session';
 import UserModel from "./models/User";
 import bcrypt from 'bcryptjs';
-import { ErrMsg, cleanUser } from "./util";
+import { ErrMsg, cleanUser, encrypt, decrypt } from "./util";
 import { ObjectId } from "mongoose";
-import crypto from 'crypto';
 const router = Router();
 const salt = bcrypt.genSaltSync();
 const email_salt = bcrypt.genSaltSync();
@@ -84,8 +83,9 @@ router.post("/signup", async (req: Request, res: Response) => {
         return;
     }
 
+    const encryptedEmail = encrypt(email);
     const hashedPass = bcrypt.hashSync(password, salt);
-    await UserModel.create({ username, password: hashedPass, hashed_email: hashedEmail });
+    await UserModel.create({ username, password: hashedPass, hashed_email: hashedEmail, encrypted_email: encryptedEmail });
 
     res.status(201).json({});
 });
