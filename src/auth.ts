@@ -2,8 +2,9 @@ import {Request, Response, Router} from "express";
 import { SessionData } from 'express-session';
 import UserModel from "./models/User";
 import bcrypt from 'bcryptjs';
-import { ErrMsg, cleanUser, encrypt, decrypt } from "./util";
-import { ObjectId } from "mongoose";
+import { ErrMsg, cleanUser, decrypt, encrypt } from "./util";
+import crypto from 'crypto';
+
 const router = Router();
 const salt = bcrypt.genSaltSync();
 const email_salt = bcrypt.genSaltSync();
@@ -85,7 +86,11 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     const encryptedEmail = encrypt(email);
     const hashedPass = bcrypt.hashSync(password, salt);
-    await UserModel.create({ username, password: hashedPass, hashed_email: hashedEmail, encrypted_email: encryptedEmail });
+    await UserModel.create({ username,
+                             password: hashedPass,
+                             hashed_email: hashedEmail,
+                             encrypted_email: encryptedEmail,
+                             email_token: crypto.randomBytes(64).toString('hex') });
 
     res.status(201).json({});
 });
@@ -100,5 +105,22 @@ router.post("/signout", async (req: Request, res: Response) => {
             res.status(500).json("Something went wrong signing out");
         })
 })
+
+router.post("/verify-email", async (req: Request, res: Response) => {
+    try {
+        const emailToken = req.body.email_token;
+        if (!emailToken) return res.status(404).json(ErrMsg("No email token provided"));
+        
+        const user: any = await UserModel.findOne({ email_token: emailToken });
+        if (!user) return res.status(404).json(ErrMsg("Not valid token"));
+
+        delete user._doc.email_token;
+        user._doc.email_valid = true;
+        console.log(decrypt(user._doc.encrypted_email));
+        await user.save();
+
+        res.status(201).json(cleanUser(user._doc));
+    } catch (error) { console.error(error); }
+});
 
 export default router;

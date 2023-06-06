@@ -26,8 +26,11 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     encrypted_email: {
-        type: String,
+        type: Object,
         required: true
+    },
+    email_token: {
+        type: String
     }
     //add more fields ask Michelle --> first and last names, etc.
 });
