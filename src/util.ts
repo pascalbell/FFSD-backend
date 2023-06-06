@@ -12,7 +12,7 @@ export const cleanUser = (userDB: any)=>{
     delete newUserDB.password;
     delete newUserDB.__v;
     delete newUserDB.hashed_email;
-    newUserDB.encrypted_email = decrypt(newUserDB.encrypted_email);
+    newUserDB.encrypted_email = decrypt(userDB.encrypted_email);
     return newUserDB;
 }
 
@@ -45,12 +45,18 @@ export const mailTransporter = () => {
 
 export const sendVerification = (user: any) => {
     const transporter = mailTransporter();
+    const cleanedUser = cleanUser(user);
+    console.log(cleanedUser.encrypted_email);
+    console.log(user.email_token);
 
     const mailOptions = {
         from: '"FFSD Test Verification" <testing-ffsd@outlook.com>',
-        to: "pascalbell16@gmail.com",
+        to: `${cleanedUser.encrypted_email}`,
         subject: "Verify your email...",
-        html: `<p>Hello ${user.name}</p>`
+        html: `<b>Hello ${user.username}</b>
+            <p> Verify your email by clicking this link</p>
+            <a href='http://localhost:3000/verify-email?token=${user.email_token}'>
+            Verify Email </a>`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
