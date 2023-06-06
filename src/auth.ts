@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import { SessionData } from 'express-session';
 import UserModel from "./models/User";
 import bcrypt from 'bcryptjs';
-import { ErrMsg, cleanUser, decrypt, encrypt, sendVerification } from "./util";
+import { ErrMsg, cleanUser, encrypt, sendVerification, sendPasswordReset } from "./util";
 import crypto from 'crypto';
 
 const router = Router();
@@ -94,7 +94,7 @@ router.post("/signup", async (req: Request, res: Response) => {
                                         email_token: crypto.randomBytes(64).toString('hex') });
     
     (req.session as User)._id = user._id.toString();
-    //sendVerification(user);
+    sendVerification(user);
 
     res.status(201).json({});
 });
@@ -130,13 +130,11 @@ router.post("/forgot", async (req: Request, res: Response) => {
     const hashedEmail = bcrypt.hashSync(req.body.email, email_salt);
     const user = await UserModel.findOne({ hashed_email: hashedEmail });
 
-    if(!user) {
-        return res.status(404).json(ErrMsg("No account associated with this account"));
-    }
+    if(!user) return res.status(404).json(ErrMsg("No account associated with this account"));
 
-    //update password token
     user.password_token = crypto.randomBytes(64).toString('hex');
-    //send email
+    sendPasswordReset(user);
+    return;
 });
 
 //activates this request when the user actually clicks the reset button
@@ -149,6 +147,7 @@ router.post("/reset", async (req: Request, res: Response) => {
     }
 
     user.password = bcrypt.hashSync(req.body.password, salt);
+    user.password_token = null;
     return;
 });
 

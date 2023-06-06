@@ -73,7 +73,7 @@ export const sendPasswordReset = (user: any) => {
         subject: "Reset your password...",
         html: `<h>Hello ${user.username}</h>
             <p> Thank you for registering! Before being able to use your account you need to verify that this is your email address by clicking here:</p>
-            <a href='http://localhost:3000/verify-email?token=${user.password_token}'>
+            <a href='http://localhost:3000/reset?token=${user.password_token}'>
             Reset password </a>`
     };
 
