@@ -51,7 +51,7 @@ export const sendVerification = (user: any) => {
         from: '"FFSD Test Verification" <testing-ffsd@outlook.com>',
         to: `${cleanedUser.encrypted_email}`,
         subject: "Verify your email...",
-        html: `<b>Hello ${user.username}</b>
+        html: `<h>Hello ${user.username}</h>
             <p> Thank you for registering! Before being able to use your account you need to verify that this is your email address by clicking here:</p>
             <a href='http://localhost:3000/verify-email?token=${user.email_token}'>
             Verify Email </a>`
@@ -61,4 +61,24 @@ export const sendVerification = (user: any) => {
         if (error) return console.log(error);
         console.log("verification sent");
     });
+}
+
+export const sendPasswordReset = (user: any) => {
+    const transporter = mailTransporter();
+    const cleanedUser = cleanUser(user);
+
+    const mailOptions = {
+        from: '"FFSD Test Verification" <testing-ffsd@outlook.com>',
+        to: `${cleanedUser.encrypted_email}`,
+        subject: "Reset your password...",
+        html: `<h>Hello ${user.username}</h>
+            <p> Thank you for registering! Before being able to use your account you need to verify that this is your email address by clicking here:</p>
+            <a href='http://localhost:3000/verify-email?token=${user.password_token}'>
+            Reset password </a>`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) return console.log(error);
+        console.log("Password reset sent");
+    }); 
 }

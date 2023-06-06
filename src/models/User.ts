@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
     },
     email_token: {
         type: String
+    },
+    password_token: {
+        type: String,
+        default: null
     }
     //add more fields ask Michelle --> first and last names, etc.
 });
