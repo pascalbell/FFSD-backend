@@ -46,8 +46,6 @@ export const mailTransporter = () => {
 export const sendVerification = (user: any) => {
     const transporter = mailTransporter();
     const cleanedUser = cleanUser(user);
-    console.log(cleanedUser.encrypted_email);
-    console.log(user.email_token);
 
     const mailOptions = {
         from: '"FFSD Test Verification" <testing-ffsd@outlook.com>',

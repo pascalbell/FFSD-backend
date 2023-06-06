@@ -111,7 +111,6 @@ router.post("/signout", async (req: Request, res: Response) => {
 router.post("/verify-email", async (req: Request, res: Response) => {
     try {
         const emailToken = req.body.email_token;
-        console.log(emailToken);
         if (!emailToken) return res.status(404).json(ErrMsg("No email token provided"));
 
         const user: any = await UserModel.findOneAndUpdate(
