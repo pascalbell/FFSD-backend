@@ -134,7 +134,7 @@ router.post("/forgot", async (req: Request, res: Response) => {
 
     user.password_token = crypto.randomBytes(64).toString('hex');
     sendPasswordReset(user);
-    return;
+    return res.status(201).json({message: "Password reset sent."});
 });
 
 //activates this request when the user actually clicks the reset button
@@ -147,7 +147,7 @@ router.post("/reset", async (req: Request, res: Response) => {
     }
 
     user.password = bcrypt.hashSync(req.body.password, salt);
-    user.password_token = null;
+    user.password_token = undefined;
     return;
 });
 
