@@ -7,7 +7,8 @@ import crypto from 'crypto';
 
 const router = Router();
 const salt = bcrypt.genSaltSync();
-const email_salt = bcrypt.genSaltSync();
+const emailSalt = bcrypt.genSaltSync();
+
 
 export interface User extends SessionData {        //Session data
     _id?: String;
@@ -31,7 +32,7 @@ const destroySession = (req: Request): Promise<void>=>{
 router.get("/me", async (req, res) => {
     const user = req.session as User;
     if (!user._id) {
-        res.status(400).json(ErrMsg("not logged in!"));
+        res.status(400).json(ErrMsg("Not logged in!"));
         return;
     }
     const userDB = await UserModel.findOne({ _id: user._id }) as any;
@@ -47,7 +48,7 @@ router.get("/me", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     if (!req.body || !req.body.username || !req.body.password) {
-        res.status(422).json(ErrMsg("not all fields provided"));
+        res.status(422).json(ErrMsg("Not all fields provided!"));
         return;
     }
     
@@ -81,12 +82,11 @@ router.post("/signup", async (req: Request, res: Response) => {
         res.status(422).json(ErrMsg("Signup must have a valid username, password, and email."));
         return;
     }
-    const hashedEmail = bcrypt.hashSync(email, email_salt);
+    const hashedEmail = bcrypt.hashSync(email, emailSalt);
     const userDB = await UserModel.findOne({ $or: [{ username: username }, { hashed_email: hashedEmail }]});
 
-    /*issue here where keeping email constant doesnt trigger user already exists, only happens when backend is resaved
-    when resaved, the same emails are hashed differently --> maybe its using a different salt or something when you resave
-    */
+    /*issue that restarting backend server hashes emails with different salt, so emails cannot be compared properly
+    when backend is restarted*/
     if (userDB) {
         res.status(400).send(ErrMsg("User already exists!"));
         return;
@@ -114,14 +114,14 @@ router.post("/signout", async (req: Request, res: Response) => {
         })
         .catch((e: JSONObject) => {
             console.log(e);
-            res.status(500).json("Something went wrong signing out");
+            res.status(500).json("Something went wrong signing out!");
         })
 })
 
 router.post("/verify-email", async (req: Request, res: Response) => {
     try {
         const emailToken = req.body.email_token;
-        if (!emailToken) return res.status(404).json(ErrMsg("No email token provided"));
+        if (!emailToken) return res.status(404).json(ErrMsg("No email token provided!"));
 
         const user: any = await UserModel.findOneAndUpdate(
             { email_token: emailToken },
@@ -129,16 +129,16 @@ router.post("/verify-email", async (req: Request, res: Response) => {
             { new: true }
         );
 
-        if (!user) return res.status(404).json(ErrMsg("Not valid token"));
+        if (!user) return res.status(404).json(ErrMsg("Not valid token!"));
         res.status(201).json(cleanUser(user._doc));
     } catch (error) { console.error(error); }
 });
 
 router.post("/forgot", async (req: Request, res: Response) => {
-    const hashedEmail = bcrypt.hashSync(req.body.email, email_salt);
+    const hashedEmail = bcrypt.hashSync(req.body.email, emailSalt);
     const user = await UserModel.findOne({ hashed_email: hashedEmail });
 
-    if(!user) return res.status(404).json(ErrMsg("No account associated with this account"));
+    if(!user) return res.status(404).json(ErrMsg("No account associated with this email!"));
 
     user.password_token = crypto.randomBytes(64).toString('hex');
     user.save();
@@ -152,13 +152,13 @@ router.post("/reset", async (req: Request, res: Response) => {
     const user = await UserModel.findOne({ password_token: req.body.password_token});
 
     if(!user) {
-        return res.status(404).json(ErrMsg("No password token found"));
+        return res.status(404).json(ErrMsg("No password token found!"));
     }
 
     user.password = bcrypt.hashSync(req.body.password, salt);
     user.password_token = undefined;
     user.save();
-    return res.status(201).json({ message: "password updated sucessfully." });
+    return res.status(201).json({ message: "Password updated sucessfully!" });
 });
 
 export default router;
