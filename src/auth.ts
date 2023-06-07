@@ -148,7 +148,7 @@ router.post("/reset", async (req: Request, res: Response) => {
 
     user.password = bcrypt.hashSync(req.body.password, salt);
     user.password_token = undefined;
-    return;
+    return res.status(201).json({ message: "password updated sucessfully." });
 });
 
 export default router;
