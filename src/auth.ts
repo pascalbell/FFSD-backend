@@ -77,8 +77,11 @@ router.post("/signup", async (req: Request, res: Response) => {
         return;
     }
     const hashedEmail = bcrypt.hashSync(email, email_salt);
-    const userDB = await UserModel.findOne({ $or: [{ username }, { hashedEmail }]});
-    
+    const userDB = await UserModel.findOne({ $or: [{ username: username }, { hashed_email: hashedEmail }]});
+
+    /*issue here where keeping email constant doesnt trigger user already exists, only happens when backend is resaved
+    when resaved, the same emails are hashed differently --> maybe its using a different salt or something when you resave
+    */
     if (userDB) {
         res.status(400).send(ErrMsg("User already exists!"));
         return;
@@ -92,11 +95,11 @@ router.post("/signup", async (req: Request, res: Response) => {
                                         hashed_email: hashedEmail,
                                         encrypted_email: encryptedEmail,
                                         email_token: crypto.randomBytes(64).toString('hex') });
+    user.save();
     
-    (req.session as User)._id = user._id.toString();
+    //(req.session as User)._id = user._id.toString();      this line lets the user login while joining
     sendVerification(user);
-
-    res.status(201).json({});
+    return res.status(201).json({});
 });
 
 router.post("/signout", async (req: Request, res: Response) => {
@@ -133,6 +136,7 @@ router.post("/forgot", async (req: Request, res: Response) => {
     if(!user) return res.status(404).json(ErrMsg("No account associated with this account"));
 
     user.password_token = crypto.randomBytes(64).toString('hex');
+    user.save();
     sendPasswordReset(user);
     return res.status(201).json({message: "Password reset sent."});
 });
@@ -148,6 +152,7 @@ router.post("/reset", async (req: Request, res: Response) => {
 
     user.password = bcrypt.hashSync(req.body.password, salt);
     user.password_token = undefined;
+    user.save();
     return res.status(201).json({ message: "password updated sucessfully." });
 });
 
