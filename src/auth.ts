@@ -61,6 +61,11 @@ router.post("/login", async (req, res) => {
             res.status(201).json(ErrMsg('Already logged in!'));
             return;
         }
+
+        if(!userDB.email_valid) {
+            return res.status(404).json(ErrMsg('Email not verified!'))
+        }
+        
         user._id = userDB._id.toString();        //every entry in DB has _id, only logged in sessions have a sessionID
         res.status(200).json(cleanUser(userDB._doc));
         return;
