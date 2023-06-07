@@ -3,8 +3,13 @@ import express from "express";
 import session from 'express-session';
 import router, { User } from "./auth";
 import mongoose from "mongoose";
+import Stripe from 'stripe';
+
 const PORT: number = 80;
 const app = express();
+const stripe = new Stripe('YOUR_SECRET_KEY', {
+    apiVersion: "2022-11-15",
+  });
 
 mongoose.connect(process.env.MONGODB_URI!)
     .then(() => { console.log("connected") })
