@@ -102,7 +102,7 @@ router.post("/signup", async (req: Request, res: Response) => {
                                         email_token: crypto.randomBytes(64).toString('hex') });
     user.save();
     
-    //(req.session as User)._id = user._id.toString();      this line lets the user login while joining
+    //(req.session as User)._id = user._id.toString();      //this line lets the user login while joining
     sendVerification(user);
     return res.status(201).json({});
 });
@@ -130,6 +130,7 @@ router.post("/verify-email", async (req: Request, res: Response) => {
         );
 
         if (!user) return res.status(404).json(ErrMsg("Not valid token!"));
+        (req.session as User)._id = user._id.toString();
         res.status(201).json(cleanUser(user._doc));
     } catch (error) { console.error(error); }
 });
