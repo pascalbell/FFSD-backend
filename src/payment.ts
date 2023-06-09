@@ -20,11 +20,12 @@ router2.post('/create-checkout-session', async (req: Request, res: Response) => 
             quantity: 1,
           },
         ],
-        success_url: 'https://localhost/3000',
-        cancel_url: 'https://localhost/NotFound',
+        success_url: 'localhost:3000',
+        cancel_url: 'localhost:NotFound',
         //customer_email: customerEmail,
       });
-      res.json({ id: session.id });
+      res.status(200).json({ id: session.id });
+
     } catch (error) {
       console.error('Error creating checkout session:', error);
       res.status(500).json({ error: 'Failed to create checkout session' });
