@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   });
 
 router2.post('/create-checkout-session', async (req: Request, res: Response) => {
-    const { planId, /*customerEmail*/ } = req.body;
+    const { planId, customerEmail } = req.body;
   
     try {
       // Create a new Stripe checkout session for annual subscription
@@ -20,9 +20,9 @@ router2.post('/create-checkout-session', async (req: Request, res: Response) => 
             quantity: 1,
           },
         ],
-        success_url: 'localhost:3000',
-        cancel_url: 'localhost:NotFound',
-        //customer_email: customerEmail,
+        success_url: 'https://localhost:3000/',           //change links
+        cancel_url: 'https://localhost:3000/NotFound',    //change link
+        customer_email: customerEmail,
       });
       res.status(200).json({ id: session.id });
 
