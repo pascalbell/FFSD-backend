@@ -52,7 +52,7 @@ export const sendVerification = (user: any) => {
         to: `${cleanedUser.encrypted_email}`,
         subject: "Verify your email...",
         html: `<h>Hello ${user.username}</h>
-            <p> Thank you for registering! Before being able to use your account you need to verify that this is your email address by clicking here:</p>
+            <p> Thank you for registering! Please click below to verify your email adress and proceed to payment:</p>
             <a href='http://localhost:3000/verify-email?token=${user.email_token}'>
             Verify Email </a>`
     };

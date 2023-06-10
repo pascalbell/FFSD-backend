@@ -6,9 +6,6 @@ import { ErrMsg, cleanUser, encrypt, sendVerification, sendPasswordReset } from 
 import crypto from 'crypto';
 
 const router = Router();
-const salt = bcrypt.genSaltSync();
-const emailSalt = bcrypt.genSaltSync();
-
 
 export interface User extends SessionData {        //Session data
     _id?: String;
@@ -82,7 +79,7 @@ router.post("/signup", async (req: Request, res: Response) => {
         res.status(422).json(ErrMsg("Signup must have a valid username, password, and email."));
         return;
     }
-    const hashedEmail = bcrypt.hashSync(email, emailSalt);
+    const hashedEmail = bcrypt.hashSync(email, process.env.EMAIL_SALT);
     const userDB = await UserModel.findOne({ $or: [{ username: username }, { hashed_email: hashedEmail }]});
 
     /*issue that restarting backend server hashes emails with different salt, so emails cannot be compared properly
@@ -93,7 +90,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     }
 
     const encryptedEmail = encrypt(email);
-    const hashedPass = bcrypt.hashSync(password, salt);
+    const hashedPass = bcrypt.hashSync(password, process.env.PASSWORD_SALT);
     const user: any = await UserModel.create({ 
                                         username,
                                         password: hashedPass,
@@ -128,7 +125,7 @@ router.post("/verify-email", async (req: Request, res: Response) => {
             { $set: { email_token: null, email_valid: true} },
             { new: true }
         );
-
+        
         if (!user) return res.status(404).json(ErrMsg("Not valid token!"));
         (req.session as User)._id = user._id.toString();
         res.status(201).json(cleanUser(user._doc));
@@ -136,7 +133,7 @@ router.post("/verify-email", async (req: Request, res: Response) => {
 });
 
 router.post("/forgot", async (req: Request, res: Response) => {
-    const hashedEmail = bcrypt.hashSync(req.body.email, emailSalt);
+    const hashedEmail = bcrypt.hashSync(req.body.email, process.env.EMAIL_SALT);
     const user = await UserModel.findOne({ hashed_email: hashedEmail });
 
     if(!user) return res.status(404).json(ErrMsg("No account associated with this email!"));
@@ -156,7 +153,7 @@ router.post("/reset", async (req: Request, res: Response) => {
         return res.status(404).json(ErrMsg("No password token found!"));
     }
 
-    user.password = bcrypt.hashSync(req.body.password, salt);
+    user.password = bcrypt.hashSync(req.body.password, process.env.PASSWORD_SALT);
     user.password_token = undefined;
     user.save();
     return res.status(201).json({ message: "Password updated sucessfully!" });
