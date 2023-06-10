@@ -94,7 +94,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     const encryptedEmail = encrypt(email);
     const hashedPass = bcrypt.hashSync(password, salt);
-    const user = await UserModel.create({ 
+    const user: any = await UserModel.create({ 
                                         username,
                                         password: hashedPass,
                                         hashed_email: hashedEmail,
@@ -104,7 +104,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     
     //(req.session as User)._id = user._id.toString();      //this line lets the user login while joining
     sendVerification(user);
-    return res.status(201).json({});
+    return res.status(201).json(cleanUser(user._doc));
 });
 
 router.post("/signout", async (req: Request, res: Response) => {
