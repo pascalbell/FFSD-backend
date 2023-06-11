@@ -1,11 +1,21 @@
-import crypto, { BinaryLike } from 'crypto';
+import crypto from 'crypto';
 import nodemailer from "nodemailer";
+import { Request } from "express";
 
 const encryptionKey = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
 
 export const ErrMsg = (msg: any) => {
     return {error: msg};
 }
+
+export const destroySession = (req: Request): Promise<void> => {      //does export allow to be called in the function
+    return new Promise((resolve, reject)=>{
+        req.session.destroy((err) => {
+            if (err) return reject(ErrMsg(err));
+            resolve();
+        })
+    });
+};
 
 export const cleanUser = (userDB: any) => {
     const newUserDB = Object.assign({}, userDB);

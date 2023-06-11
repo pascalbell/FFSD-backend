@@ -34,6 +34,9 @@ const UserSchema = new mongoose.Schema({
     },
     password_token: {
         type: String,
+    },
+    stripe_id: {
+        type: String
     }
     //add more fields ask Michelle --> first and last names, etc.
 });

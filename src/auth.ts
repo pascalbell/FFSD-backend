@@ -4,6 +4,7 @@ import UserModel from "./models/User";
 import bcrypt from 'bcryptjs';
 import { ErrMsg, cleanUser, encrypt, sendVerification, sendPasswordReset } from "./util";
 import crypto from 'crypto';
+import { destroySession } from "./util";
 
 const router = Router();
 
@@ -17,14 +18,7 @@ type JSONObject = {
     [key: string]: JSONKey
 };
 
-const destroySession = (req: Request): Promise<void>=>{
-    return new Promise((resolve, reject)=>{
-        req.session.destroy((err) => {
-            if (err) return reject(ErrMsg(err));
-            resolve();
-        })
-    });
-};
+
 
 router.get("/me", async (req, res) => {
     const user = req.session as User;
