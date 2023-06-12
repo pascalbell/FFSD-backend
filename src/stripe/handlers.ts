@@ -7,6 +7,7 @@ export const handleSubscriptionCreated = async (subscription: any, cust_email: s
         return;
     }
     
+    //need to encrypt email before searching
     const user = await UserModel.findOne({ email: cust_email });
     if(!user) {
         return console.log(ErrMsg("No password token found!"));                 //update this line to acc do smth useful

@@ -12,7 +12,7 @@ mongoose.connect(process.env.MONGODB_URI!)
     .then(() => { console.log("connected") })
     .catch((err) => { console.log(err) });
 
-app.use(express.json());                    //allows parsing on json
+//app.use(express.json());                    //allows parsing on json
 app.use(express.urlencoded());
 app.use(session({
     secret: process.env.SESSION_SECRET!,

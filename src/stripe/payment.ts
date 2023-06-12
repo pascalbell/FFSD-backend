@@ -89,9 +89,11 @@ router2.post(
   '/webhook',
   express.raw({ type: 'application/json' }),
   (request: Request, response: Response) => {
-  console.log("webhook triggered");
+  
   let event = request.body;
-  const rawBody = request.body.toString();
+  const rawBody = JSON.stringify(request.body);
+  console.log(rawBody);
+  
   // Replace this endpoint secret with your endpoint's unique secret
   // If you are testing with the CLI, find the secret by running 'stripe listen'
   // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
@@ -154,7 +156,7 @@ router2.post(
       console.log(`Unhandled event type ${event.type}.`);
   }
   // Return a 200 response to acknowledge receipt of the event
-  response.send();
+  response.send().end();
 });
 
 export default router2;
