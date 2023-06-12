@@ -89,7 +89,9 @@ router2.post(
   '/webhook',
   express.raw({ type: 'application/json' }),
   (request: Request, response: Response) => {
+  console.log("webhook triggered");
   let event = request.body;
+  const rawBody = request.body.toString();
   // Replace this endpoint secret with your endpoint's unique secret
   // If you are testing with the CLI, find the secret by running 'stripe listen'
   // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
@@ -102,15 +104,18 @@ router2.post(
     const signature = request.headers['stripe-signature'];
     try {
       event = stripe.webhooks.constructEvent(
-        request.body,
+        rawBody,
         signature!,
         endpointSecret
       );
     } catch (err: any) {
       console.log(`⚠️  Webhook signature verification failed.`, err.message);
       return response.sendStatus(400);
-    }
+    } 
+  } else {
+    event = JSON.parse(rawBody);
   }
+
   let cust_email: any;
   let subscription;                                 //set = event.data.object
   let status;                                       //set = subscription.status and delete these lines in switch
