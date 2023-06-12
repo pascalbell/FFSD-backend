@@ -37,6 +37,9 @@ const UserSchema = new mongoose.Schema({
     },
     stripe_id: {
         type: String
+    },
+    expiration_date: {
+        type: Date
     }
     //add more fields ask Michelle --> first and last names, etc.
 });

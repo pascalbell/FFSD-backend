@@ -3,7 +3,7 @@ import express from "express";
 import session from 'express-session';
 import router, { User } from "./auth";
 import mongoose from "mongoose";
-import router2 from "./payment";
+import router2 from "./stripe/payment";
 
 const PORT: number = 80;
 const app = express();
