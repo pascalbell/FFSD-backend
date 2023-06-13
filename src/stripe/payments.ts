@@ -30,7 +30,6 @@ router3.post('/create-checkout-session', async (req: Request, res: Response) => 
         customer_email: customerEmail,
         currency: 'usd'
       });
-      console.log(session.id);
       res.status(200).json({ id: session.id });
   
     } catch (error) {

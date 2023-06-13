@@ -18,6 +18,7 @@ export const handlePaymentIntentSucceeded = async (payment_intent: any, cust_ema
     }
     
     user.stripe_id = payment_intent.customer;
+    console.log(payment_intent.subscription_data + " " + payment_intent.subscription_data.current_period_end);
     if (payment_intent.subscription_data && payment_intent.subscription_data.current_period_end) {
         user.expiration_date = new Date(payment_intent.subscription_data.current_period_end * 1000);    //return useful smth if doesnt work
     }
