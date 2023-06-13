@@ -84,79 +84,37 @@ router2.post('/create-portal-session', async (req: Request, res: Response) => {
   return res.status(200).json({ portalSession: portalSession.url });
   //return res.redirect(303, portalSession.url);
 });
-
+// 7b 0a 20 20 22 69 64 22 3a 20 22 65 76 74 5f 33 4e 49 4d 78 6a 41 78 76 6d 39 50 6e 32 63 4d 31 7a 4c 6d 58
 router2.post(
   '/webhook',
-  express.raw({ type: 'application/json' }),
+  express.raw({type: 'application/json'}),
   (request: Request, response: Response) => {
-  
-  let event = request.body;
-  const rawBody = JSON.stringify(request.body);
-  console.log(rawBody);
-  
-  // Replace this endpoint secret with your endpoint's unique secret
-  // If you are testing with the CLI, find the secret by running 'stripe listen'
-  // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-  // at https://dashboard.stripe.com/webhooks
-  const endpointSecret = process.env.CLI_WEBHOOK_SECRET;
-  // Only verify the event if you have an endpoint secret defined.
-  // Otherwise use the basic event deserialized with JSON.parse
-  if (endpointSecret) {
-    // Get the signature sent by Stripe
-    const signature = request.headers['stripe-signature'];
+    const sig: any = request.headers['stripe-signature']!;
+    let event;
+    
     try {
-      event = stripe.webhooks.constructEvent(
-        rawBody,
-        signature!,
-        endpointSecret
-      );
+      event = stripe.webhooks.constructEvent(request.body, sig, process.env.CLI_WEBHOOK_SECRET!);
     } catch (err: any) {
-      console.log(`⚠️  Webhook signature verification failed.`, err.message);
-      return response.sendStatus(400);
-    } 
-  } else {
-    event = JSON.parse(rawBody);
-  }
-
-  let cust_email: any;
-  let subscription;                                 //set = event.data.object
-  let status;                                       //set = subscription.status and delete these lines in switch
-
-  switch (event.type) {
-    case 'customer.subscription.trial_will_end':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      //handleSubscriptionTrialEnding(subscription);
-      break;
-    case 'customer.subscription.deleted':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      // Then define and call a method to handle the subscription deleted.
-      // handleSubscriptionDeleted(subscriptionDeleted);
-      break;
-    case 'customer.subscription.created':
-      subscription = event.data.object;
-      status = subscription.status;
-      cust_email = getCustomerEmail(subscription.customer);
-      console.log(`Subscription status is ${status}.` + `Email is ${cust_email}`);
-
-      handleSubscriptionCreated(subscription, cust_email);
-      break;
-    case 'customer.subscription.updated':
-      subscription = event.data.object;
-      status = subscription.status;
-      console.log(`Subscription status is ${status}.`);
-      // Then define and call a method to handle the subscription update.
-      // handleSubscriptionUpdated(subscription);
-      break;
-    default:
-      // Unexpected event type
-      console.log(`Unhandled event type ${event.type}.`);
-  }
-  // Return a 200 response to acknowledge receipt of the event
-  response.send().end();
+      console.log("ERROR");
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+  
+    // Handle the event
+    switch (event.type) {
+      case 'customer.subscription.created':
+        const eventData = event.data.object;
+        console.log("GOOD EVENT")
+        console.log(eventData);
+        // Then define and call a function to handle the event payment_intent.succeeded
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+  
+    // Return a 200 response to acknowledge receipt of the event
+    response.send();
 });
 
 export default router2;
