@@ -30,6 +30,7 @@ router2.post(
   async (request: Request, response: Response) => {
     const sig: any = request.headers['stripe-signature']!;
     let event;
+    let email;
 
     try {
       event = stripe.webhooks.constructEvent(request.body, sig, process.env.CLI_WEBHOOK_SECRET!);
@@ -38,16 +39,18 @@ router2.post(
       response.status(400).send(`Webhook Error: ${err.message}`);
       return;
     }
-  
-    // Handle the event
+
     switch (event.type) {
-      case 'payment_intent.succeeded':
+      case 'payment_intent.succeeded':  
         const payment_intent: any = event.data.object;
-        const email = await getCustomerEmail(payment_intent.customer);
+        email = await getCustomerEmail(payment_intent.customer);
         handlePaymentIntentSucceeded(payment_intent, email);
         // Then define and call a function to handle the event payment_intent.succeeded
         break;
-      // ... handle other event types
+      case 'customer.subscription.updated':
+        const subscription:any = event.data.object;
+        console.log(subscription);
+        console.log(new Date(subscription.current_period_end * 1000));
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
