@@ -6,6 +6,11 @@ import { ErrMsg, cleanUser, encrypt, sendVerification, sendPasswordReset } from 
 import crypto from 'crypto';
 import { destroySession } from "./util";
 
+import Stripe from 'stripe';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2022-11-15",
+  });
+
 const router = Router();
 
 export interface User extends SessionData {        //Session data

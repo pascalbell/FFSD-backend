@@ -3,7 +3,8 @@ import express from "express";
 import session from 'express-session';
 import router, { User } from "./auth";
 import mongoose from "mongoose";
-import router2 from "./stripe/payment";
+import router2 from "./stripe/webhooks";
+import router3 from "./stripe/payments";
 
 const PORT: number = 80;
 const app = express();
@@ -21,7 +22,7 @@ app.use(session({
 }));
 app.use('/api', router2);
 app.use(express.json());                    //allows parsing on json
-
+app.use('/api', router3);
 app.use('/api', router);
 
 
