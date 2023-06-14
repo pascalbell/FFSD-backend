@@ -23,6 +23,10 @@ export const cleanUser = (userDB: any) => {
     delete newUserDB.__v;
     delete newUserDB.hashed_email;
     newUserDB.encrypted_email = decrypt(userDB.encrypted_email);
+
+    if(userDB.expiration_date > new Date()) newUserDB.valid_suscription = true;
+    else {newUserDB.valid_suscription = false};
+  
     return newUserDB;
 }
 
