@@ -25,9 +25,9 @@ export const cleanUser = (userDB: any) => {
     newUserDB.encrypted_email = decrypt(userDB.encrypted_email);
 
     if(userDB.stripe_id && userDB.expiration_date && userDB.expiration_date > new Date()) {
-        newUserDB.valid_suscription = true;
+        newUserDB.valid_subscription = true;
     }
-    else {newUserDB.valid_suscription = false};
+    else {newUserDB.valid_subscription = false};
 
     delete newUserDB.expiration_date;
     delete newUserDB.stripe_id;

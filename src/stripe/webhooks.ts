@@ -47,10 +47,6 @@ router2.post(
         handlePaymentIntentSucceeded(payment_intent, email);
         // Then define and call a function to handle the event payment_intent.succeeded
         break;
-      case 'customer.subscription.updated':
-        const subscription:any = event.data.object;
-        console.log(subscription);
-        console.log(new Date(subscription.current_period_end * 1000));
       default:
         console.log(`Unhandled event type ${event.type}`);
     }

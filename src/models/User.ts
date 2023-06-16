@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema({
     expiration_date: {
         type: Date
     },
-    valid_suscription: {
+    valid_subscription: {
         type: Boolean
     }
     //add more fields ask Michelle --> first and last names, etc.

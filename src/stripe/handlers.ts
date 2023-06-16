@@ -9,7 +9,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   });
 
 export const handlePaymentIntentSucceeded = async (payment_intent: any, cust_email: string) => {
-    console.log("handlePaymentIntentSucceeded called");
     if (payment_intent.status != "succeeded") {
         console.log("Status is not active, status is set to " + payment_intent.status);
         return;

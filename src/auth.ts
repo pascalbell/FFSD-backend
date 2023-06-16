@@ -64,6 +64,7 @@ router.post("/login", async (req, res) => {
         }
         
         user._id = userDB._id.toString();        //every entry in DB has _id, only logged in sessions have a sessionID
+        console.log(cleanUser(userDB._doc));
         res.status(200).json(cleanUser(userDB._doc));
         return;
     }    
