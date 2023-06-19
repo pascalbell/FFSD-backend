@@ -25,7 +25,7 @@ router3.post('/create-checkout-session', async (req: Request, res: Response) => 
             quantity: 1,
           },
         ],
-        success_url: 'http://localhost:3000/member-portal',           //change links
+        success_url: 'http://localhost:3000/after-payment',           //change links
         cancel_url: 'http://localhost:3000/join',    //change link
         customer_email: customerEmail,
         currency: 'usd'
