@@ -22,6 +22,7 @@ export const cleanUser = (userDB: any) => {
     delete newUserDB.password;
     delete newUserDB.__v;
     delete newUserDB.hashed_email;
+    delete newUserDB.location;
     newUserDB.encrypted_email = decrypt(userDB.encrypted_email);
 
     if(userDB.stripe_id && userDB.expiration_date && userDB.expiration_date > new Date()) {
@@ -70,7 +71,7 @@ export const sendVerification = (user: any) => {
         from: '"FFSD Test Verification" <testing-ffsd@outlook.com>',
         to: `${cleanedUser.encrypted_email}`,
         subject: "Verify your email...",
-        html: `<h>Hello ${user.username}</h>
+        html: `<h>Hello ${user.first_name}</h>
             <p> Thank you for registering! Please click below to verify your email adress and proceed to payment:</p>
             <a href='http://localhost:3000/verify-email?token=${user.email_token}'>
             Verify Email </a>`
@@ -90,7 +91,7 @@ export const sendPasswordReset = (user: any) => {
         from: '"FFSD Test Verification" <testing-ffsd@outlook.com>',
         to: `${cleanedUser.encrypted_email}`,
         subject: "Reset your password...",
-        html: `<h>Hello ${user.username}</h>
+        html: `<h>Hello ${user.first_name}</h>
             <p> Please click this link to reset your password:</p>
             <a href='http://localhost:3000/reset?token=${user.password_token}'>
             Reset password </a>`

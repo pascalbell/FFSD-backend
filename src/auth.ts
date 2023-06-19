@@ -43,14 +43,16 @@ router.get("/me", async (req, res) => {
 })
 
 router.post("/login", async (req, res) => {
-    if (!req.body || !req.body.username || !req.body.password) {
+    if (!req.body || !req.body.email || !req.body.password) {
         res.status(422).json(ErrMsg("Not all fields provided!"));
         return;
     }
     
     const user = req.session as User;
-    const username = req.body.username;
-    const userDB: any = await UserModel.findOne({ username });
+    const email = req.body.email;
+    const hashedEmail = bcrypt.hashSync(email, process.env.EMAIL_SALT);
+    const userDB: any = await UserModel.findOne({ hashed_email: hashedEmail });
+
     if (userDB && bcrypt.compareSync(req.body.password, userDB.password)) {
         // Passwords match
         // Perform the necessary actions when the login is successful
@@ -67,19 +69,18 @@ router.post("/login", async (req, res) => {
         res.status(200).json(cleanUser(userDB._doc));
         return;
     }    
-    res.status(422).json(ErrMsg('Wrong password or username!'));
+    res.status(422).json(ErrMsg('Wrong password or email!'));
 });
 
 router.post("/signup", async (req: Request, res: Response) => {
-    const { username, password, email } = req.body;
-    
-    if (!username || !password || !email || typeof username != "string" || typeof password != "string" || typeof email != "string") {
+    const { prefix, firstName, lastName, practiceName, password, email, location } = req.body;
+    if (!password || !email || typeof password != "string" || typeof email != "string") {
         //add other fields above if need more
-        res.status(422).json(ErrMsg("Signup must have a valid username, password, and email."));
+        res.status(422).json(ErrMsg("Signup must have a valid email and password."));
         return;
     }
     const hashedEmail = bcrypt.hashSync(email, process.env.EMAIL_SALT);
-    const userDB = await UserModel.findOne({ $or: [{ username: username }, { hashed_email: hashedEmail }]});
+    const userDB = await UserModel.findOne({ hashed_email: hashedEmail });
 
     /*issue that restarting backend server hashes emails with different salt, so emails cannot be compared properly
     when backend is restarted*/
@@ -90,8 +91,12 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     const encryptedEmail = encrypt(email);
     const hashedPass = bcrypt.hashSync(password, process.env.PASSWORD_SALT);
-    const user: any = await UserModel.create({ 
-                                        username,
+    const user: any = await UserModel.create({
+                                        prefix: prefix,
+                                        first_name: firstName,
+                                        last_name: lastName,
+                                        practice_name: practiceName,
+                                        location: location,
                                         password: hashedPass,
                                         hashed_email: hashedEmail,
                                         encrypted_email: encryptedEmail,

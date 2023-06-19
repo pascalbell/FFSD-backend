@@ -3,9 +3,41 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
-    username: {
+    prefix: {
+        type: String,
+    },
+    first_name: {
         type: String,
         required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
+    practice_name: {
+        type: String,
+        required: true
+    },
+    location: {
+        apt: {
+            type: String,
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        practice_address: {
+            type: String,
+            required: true
+        },
+        postal_code: {
+            type: Number,
+            required: true
+        },
+        state: {
+            type: String,
+            required: true
+        }
     },
     password: {
         type: String, 
@@ -44,7 +76,6 @@ const UserSchema = new mongoose.Schema({
     valid_subscription: {
         type: Boolean
     }
-    //add more fields ask Michelle --> first and last names, etc.
 });
 
 export default mongoose.model("users", UserSchema);
