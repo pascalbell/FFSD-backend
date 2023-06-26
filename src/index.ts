@@ -5,6 +5,7 @@ import router, { User } from "./auth";
 import mongoose from "mongoose";
 import router2 from "./stripe/webhooks";
 import router3 from "./stripe/payments";
+import rateLimit from 'express-rate-limit';
 
 const PORT: number = 80;
 const app = express();
@@ -13,6 +14,14 @@ mongoose.connect(process.env.MONGODB_URI!)
     .then(() => { console.log("connected") })
     .catch((err) => { console.log(err) });
 
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, //15 minutes
+    max: 100, 
+    standardHeaders: false,
+    message: "Too many requests from this IP!",
+})
+
+app.use('/api', apiLimiter);
 app.use(express.urlencoded());
 app.use(session({
     secret: process.env.SESSION_SECRET!,
