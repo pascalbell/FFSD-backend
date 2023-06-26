@@ -151,10 +151,14 @@ router.post("/forgot", async (req: Request, res: Response) => {
 //activates this request when the user actually clicks the reset button
 //body will have a password and a password_token
 router.post("/reset", async (req: Request, res: Response) => {
+    if(!req.body.password_token) {
+        return res.status(404).json(ErrMsg("No account found"))
+    }
+
     const user = await UserModel.findOne({ password_token: req.body.password_token});
 
     if(!user) {
-        return res.status(404).json(ErrMsg("No password token found!"));
+        return res.status(404).json(ErrMsg("No account associated with this email"));
     }
 
     user.password = bcrypt.hashSync(req.body.password, process.env.PASSWORD_SALT);
