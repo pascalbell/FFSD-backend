@@ -14,14 +14,18 @@ mongoose.connect(process.env.MONGODB_URI!)
     .then(() => { console.log("connected") })
     .catch((err) => { console.log(err) });
 
-/*const apiLimiter = rateLimit({
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, //15 minutes
     max: 100, 
     standardHeaders: false,
-    message: "Too many requests from this IP!",
-})*/
+    statusCode: 200,
+    message: {
+        status: 429,
+        error: 'Too many requests. Please try again in 15 minutes.'
+    }
+})
 
-//app.use('/api', apiLimiter);
+app.use('/api', apiLimiter);
 app.use(express.urlencoded());
 app.use(session({
     secret: process.env.SESSION_SECRET!,

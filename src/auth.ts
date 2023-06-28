@@ -5,13 +5,21 @@ import bcrypt from 'bcryptjs';
 import { ErrMsg, cleanUser, encrypt, sendVerification, sendPasswordReset } from "./util";
 import crypto from 'crypto';
 import { destroySession } from "./util";
+import rateLimit from "express-rate-limit";
 
-import Stripe from 'stripe';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2022-11-15",
-  });
 
 const router = Router();
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, //5 minutes
+    max: 5, 
+    standardHeaders: false,
+    statusCode: 200,
+    message: {
+        status: 429,
+        error: 'Too many login attempts! Please try again in 15 minutes.'
+    }
+})
 
 export interface User extends SessionData {        //Session data
     _id?: String;
@@ -22,8 +30,6 @@ type JSONKey = string | boolean | number | Array<JSONKey> | JSONObject;
 type JSONObject = {
     [key: string]: JSONKey
 };
-
-
 
 router.get("/me", async (req, res) => {
     const user = req.session as User;
@@ -42,7 +48,7 @@ router.get("/me", async (req, res) => {
     res.status(200).json(cleanUser(userDB._doc));
 })
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
     if (!req.body || !req.body.email || !req.body.password) {
         res.status(422).json(ErrMsg("Not all fields provided!"));
         return;

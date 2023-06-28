@@ -2,7 +2,6 @@ import Stripe from "stripe";
 import UserModel from "../models/User";
 import { ErrMsg } from "../util";
 import bcrypt from 'bcryptjs';
-import { User } from "../auth";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2022-11-15",

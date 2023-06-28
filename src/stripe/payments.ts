@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
 import {Request, Response, Router} from "express";
-import { SessionData } from 'express-session';
 import UserModel from "../models/User";
 import { User } from '../auth';
 import { ErrMsg, destroySession } from "../util";
