@@ -25,7 +25,7 @@ router3.post('/create-checkout-session', async (req: Request, res: Response) => 
           },
         ],
         success_url: 'http://localhost:3000/after-payment',           //change links
-        cancel_url: 'http://localhost:3000/join',    //change link
+        cancel_url: 'http://localhost:3000/member-portal',    //change link
         customer_email: customerEmail,
         currency: 'usd'
       });
@@ -58,7 +58,7 @@ router3.post('/create-portal-session', async (req: Request, res: Response) => {
     }
     // This is the url to which the customer will be redirected when they are done
     // managing their billing with the portal.
-    const returnUrl = "http://localhost:3000/";
+    const returnUrl = "http://localhost:3000/member-portal";
 
     const portalSession = await stripe.billingPortal.sessions.create({
         customer: userDB.stripe_id,
