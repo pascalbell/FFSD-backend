@@ -14,9 +14,9 @@ mongoose.connect(process.env.MONGODB_URI!)
     .then(() => { console.log("connected") })
     .catch((err) => { console.log(err) });
 
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, //15 minutes
-    max: 100, 
+const apiLimiter = rateLimit({                  //creates an API rate limit that prevents more than 100 requests in 15 minutes
+    windowMs: 15 * 60 * 1000,                   //15 minutes, change time interval here
+    max: 100,                                   //edit allowed number of requests here
     standardHeaders: false,
     statusCode: 200,
     message: {
@@ -25,7 +25,7 @@ const apiLimiter = rateLimit({
     }
 })
 
-app.use('/api', apiLimiter);
+app.use('/api', apiLimiter);                    //uses api rate limit as middleware on all functions
 app.use(express.urlencoded());
 app.use(session({
     secret: process.env.SESSION_SECRET!,
@@ -33,7 +33,7 @@ app.use(session({
     saveUninitialized:false,
     cookie: { maxAge: 86400000 }            //set the cookie (login session) to expire after one day
 }));
-app.use('/api', router2);
+app.use('/api', router2);                   //uses different routers created in other functions
 app.use(express.json());                    //allows parsing on json
 app.use('/api', router3);
 app.use('/api', router);

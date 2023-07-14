@@ -10,9 +10,9 @@ import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, //5 minutes
-    max: 5, 
+const loginLimiter = rateLimit({                //creates an API rate limit for login route, prevents more than 5 requests in 15 min
+    windowMs: 15 * 60 * 1000,                   //15 minutes
+    max: 5,                                     //5 requests allowed
     standardHeaders: false,
     statusCode: 200,
     message: {
@@ -31,7 +31,7 @@ type JSONObject = {
     [key: string]: JSONKey
 };
 
-router.get("/me", async (req, res) => {
+router.get("/me", async (req, res) => {         //gets the user from database
     const user = req.session as User;
     if (!user._id) {
         res.status(400).json(ErrMsg("Not logged in!"));
@@ -39,7 +39,7 @@ router.get("/me", async (req, res) => {
     }
     const userDB = await UserModel.findOne({ _id: user._id }) as any;
 
-    if (!userDB) {
+    if (!userDB) {                              //if there is session but no corresponding user for some reason, destroy session
         destroySession(req);
         res.status(404).json(ErrMsg("Not logged in!"));
         return;
@@ -49,7 +49,7 @@ router.get("/me", async (req, res) => {
 })
 
 router.post("/login", loginLimiter, async (req, res) => {
-    if (!req.body || !req.body.email || !req.body.password) {
+    if (!req.body || !req.body.email || !req.body.password) {           //add other fields that must be passed in, update this, should include all fields in UserSchema
         res.status(422).json(ErrMsg("Not all fields provided!"));
         return;
     }
@@ -61,13 +61,12 @@ router.post("/login", loginLimiter, async (req, res) => {
 
     if (userDB && bcrypt.compareSync(req.body.password, userDB.password)) {
         // Passwords match
-        // Perform the necessary actions when the login is successful
-        if (user._id) {
+        if (user._id) {                                         //already has a session = already logged in
             res.status(201).json(ErrMsg('Already logged in!'));
             return;
         }
 
-        if(!userDB.email_valid) {
+        if(!userDB.email_valid) {                              //email not verified
             return res.status(404).json(ErrMsg('Email not verified!'))
         }
         
@@ -79,7 +78,7 @@ router.post("/login", loginLimiter, async (req, res) => {
 });
 
 router.post("/signup", async (req: Request, res: Response) => {
-    const { prefix, firstName, lastName, practiceName, password, email, location } = req.body;
+    const { prefix, firstName, lastName, practiceName, password, email, location } = req.body;          //add other member fields
     if (!password || !email || typeof password != "string" || typeof email != "string") {
         //add other fields above if need more
         res.status(422).json(ErrMsg("Signup must have a valid email and password."));
@@ -89,7 +88,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     const userDB = await UserModel.findOne({ hashed_email: hashedEmail });
 
     /*issue that restarting backend server hashes emails with different salt, so emails cannot be compared properly
-    when backend is restarted*/
+    when backend is restarted-- FIXED*/
     if (userDB) {
         res.status(400).send(ErrMsg("User already exists!"));
         return;
@@ -97,7 +96,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     const encryptedEmail = encrypt(email);
     const hashedPass = bcrypt.hashSync(password, process.env.PASSWORD_SALT);
-    const user: any = await UserModel.create({
+    const user: any = await UserModel.create({                  //add new fields here that should be created when user signs up
                                         prefix: prefix,
                                         first_name: firstName,
                                         last_name: lastName,
@@ -106,7 +105,7 @@ router.post("/signup", async (req: Request, res: Response) => {
                                         password: hashedPass,
                                         hashed_email: hashedEmail,
                                         encrypted_email: encryptedEmail,
-                                        email_token: crypto.randomBytes(64).toString('hex') });
+                                        email_token: crypto.randomBytes(64).toString('hex') });         //for email reset
     user.save();
     
     //(req.session as User)._id = user._id.toString();      //this line lets the user login while joining
@@ -143,11 +142,13 @@ router.post("/verify-email", async (req: Request, res: Response) => {
 });
 
 router.post("/forgot", async (req: Request, res: Response) => {
+    //hash email passed through body and check matches in database
     const hashedEmail = bcrypt.hashSync(req.body.email, process.env.EMAIL_SALT);
     const user = await UserModel.findOne({ hashed_email: hashedEmail });
 
     if(!user) return res.status(404).json(ErrMsg("No account associated with this email!"));
 
+    //create password token for user and send password reset that will compare tokens to allow reset
     user.password_token = crypto.randomBytes(64).toString('hex');
     user.save();
     sendPasswordReset(user);
@@ -167,6 +168,7 @@ router.post("/reset", async (req: Request, res: Response) => {
         return res.status(404).json(ErrMsg("No account associated with this email"));
     }
 
+    //password tokens match, update with new password
     user.password = bcrypt.hashSync(req.body.password, process.env.PASSWORD_SALT);
     user.password_token = undefined;
     user.save();

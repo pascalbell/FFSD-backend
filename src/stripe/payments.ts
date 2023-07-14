@@ -11,21 +11,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   });
 
 router3.post('/create-checkout-session', async (req: Request, res: Response) => {
+    //opens stripe external checkout page
     const { planId, customerEmail } = req.body;
   
     try {
       // Create a new Stripe checkout session for annual subscription
       const session = await stripe.checkout.sessions.create({
-        mode: 'subscription',
+        mode: 'subscription',               //change this depending on payment type
         payment_method_types: ['card'],
         line_items: [
           {
-            price: planId,          //change this to the subscription
+            price: planId,
             quantity: 1,
           },
         ],
-        success_url: 'http://localhost:3000/after-payment',           //change links
-        cancel_url: 'http://localhost:3000/member-portal',    //change link
+        success_url: 'http://localhost:3000/after-payment',
+        cancel_url: 'http://localhost:3000/member-portal',
         customer_email: customerEmail,
         currency: 'usd'
       });
@@ -36,7 +37,8 @@ router3.post('/create-checkout-session', async (req: Request, res: Response) => 
       res.status(500).json({ error: 'Failed to create checkout session' });
     }
   });
-  
+
+//creates a manage subscription external page, create this based on session id
 router3.post('/create-portal-session', async (req: Request, res: Response) => {
     const user = req.session as User;
     if (!user._id) {

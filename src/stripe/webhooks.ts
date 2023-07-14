@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2022-11-15",
 });
 
-const getCustomerEmail = async (customerId: string) => {
+const getCustomerEmail = async (customerId: string) => {    //fetch customer from stripe
   return stripe.customers.retrieve(customerId)
     .then((customer: any) => {
       const email = customer.email;
@@ -24,6 +24,7 @@ export interface User extends SessionData {        //Session data
   _id?: String;
 }
 
+//this listens for stripe webhooks and executes the necessary functions based on webhook
 router2.post(
   '/webhook',
   express.raw({type: 'application/json'}),
@@ -41,12 +42,14 @@ router2.post(
     }
 
     switch (event.type) {
-      case 'payment_intent.succeeded':  
+      //this is the only important webhook, it is the webhook sent when subscription is created
+      // and payment has suceeded
+      case 'payment_intent.succeeded': 
         const payment_intent: any = event.data.object;
         email = await getCustomerEmail(payment_intent.customer);
-        handlePaymentIntentSucceeded(payment_intent, email);
-        // Then define and call a function to handle the event payment_intent.succeeded
+        handlePaymentIntentSucceeded(payment_intent, email);      //this handles stripe payment
         break;
+      //add other webhooks here and define handlers in handlers.ts
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
