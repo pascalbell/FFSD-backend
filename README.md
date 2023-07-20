@@ -22,13 +22,15 @@ The mailTransporter variable in the util.ts file in the backend project must be 
 MongoDB
 
 # Set up the MongoDB database:
-Create a new database under the default URI mongodb://localhost:27017. Create a users collection in this database.
-If MangoDB is connected correctly when application is running, console should log “connected”.
+- Create a new database under the default URI mongodb://localhost:27017.
+- Create a users collection in this database.
+- If MangoDB is connected correctly when application is running, console should log “connected”.
 
 # Updating email templates:
-Verification email: edit sendVerification() const in “src/utils.ts”
-Password reset email: edit sendPasswordReset() const in “src/utils.ts”
-Adding new fields to member registration:
-Add fields to “/src/models/User.ts” in UserSchema
-Add fields to lines 52, 81, 99 of “/src/auth.ts”
+- Verification email: edit sendVerification() const in “src/utils.ts”
+- Password reset email: edit sendPasswordReset() const in “src/utils.ts”
+
+# Adding new fields to member registration:
+- Add fields to “/src/models/User.ts” in UserSchema
+-Add fields to lines 52, 81, 99 of “/src/auth.ts”
 
